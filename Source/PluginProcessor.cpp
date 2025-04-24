@@ -35,7 +35,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout LModelAudioProcessor::create
 	layout.add(std::make_unique<juce::AudioParameterFloat>("dft", "dft", 0, 1, 0.5));
 	layout.add(std::make_unique<juce::AudioParameterFloat>("dmt", "dmt", 0, 1, 0.5));
 	layout.add(std::make_unique<juce::AudioParameterFloat>("sv", "sv", 0, 1, 0.5));
-	layout.add(std::make_unique<juce::AudioParameterFloat>("tv", "tv", 0, 1, 0.5));
+	layout.add(std::make_unique<juce::AudioParameterFloat>("tv", "tv", 0, 1, 1.0));
 
 	return layout;
 }
@@ -185,10 +185,18 @@ void LModelAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	//pvl.ProcessBlock(recbufl, buf1l, buf2l, numSamples);
 	//pvr.ProcessBlock(recbufr, buf1r, buf2r, numSamples);
 
+	rsl.SetMatchF(tv);
+	rsr.SetMatchF(tv);
+	rsl.SetPitch(powf(2.0, (sv - 0.5) * 2.0 * 2.0));//4个8度
+	rsr.SetPitch(powf(2.0, (sv - 0.5) * 2.0 * 2.0));//4个8度
+	rsl.ProcessBlock(recbufl, buf1l, numSamples);
+	rsr.ProcessBlock(recbufr, buf1r, numSamples);
+
+
 	for (int i = 0; i < numSamples; ++i)
 	{
-		wavbufl[i] = buf1l[i] * sv + buf2l[i] * tv;
-		wavbufr[i] = buf1r[i] * sv + buf2r[i] * tv;
+		wavbufl[i] = buf1l[i];
+		wavbufr[i] = buf1r[i];
 	}
 }
 
