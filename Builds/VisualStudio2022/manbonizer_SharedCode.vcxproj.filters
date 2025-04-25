@@ -3066,6 +3066,9 @@
     <ClInclude Include="..\..\Source\dsp\formsep.h">
       <Filter>manbonizer\Source\dsp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\dsp\wsola.h">
+      <Filter>manbonizer\Source\dsp</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\dsp\complex.h">
       <Filter>manbonizer\Source\dsp</Filter>
     </ClInclude>

@@ -8,6 +8,7 @@
         <FILE id="egryUv" name="applyformant.h" compile="0" resource="0" file="Source/dsp/applyformant.h"/>
         <FILE id="uFuaO0" name="resynth.h" compile="0" resource="0" file="Source/dsp/resynth.h"/>
         <FILE id="QD7vEU" name="formsep.h" compile="0" resource="0" file="Source/dsp/formsep.h"/>
+        <FILE id="CiavHE" name="wsola.h" compile="0" resource="0" file="Source/dsp/wsola.h"/>
         <FILE id="pmeeo8" name="complex.cpp" compile="1" resource="0" file="Source/dsp/complex.cpp"/>
         <FILE id="EQejeP" name="complex.h" compile="0" resource="0" file="Source/dsp/complex.h"/>
         <FILE id="hsU539" name="fft.cpp" compile="1" resource="0" file="Source/dsp/fft.cpp"/>

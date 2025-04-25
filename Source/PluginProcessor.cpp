@@ -31,11 +31,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout LModelAudioProcessor::create
 {
 	juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
-	layout.add(std::make_unique<juce::AudioParameterFloat>("fqt", "fqt", 0, 1, 0));
-	layout.add(std::make_unique<juce::AudioParameterFloat>("dft", "dft", 0, 1, 0.5));
-	layout.add(std::make_unique<juce::AudioParameterFloat>("dmt", "dmt", 0, 1, 0.5));
-	layout.add(std::make_unique<juce::AudioParameterFloat>("sv", "sv", 0, 1, 0.5));
-	layout.add(std::make_unique<juce::AudioParameterFloat>("tv", "tv", 0, 1, 1.0));
+	layout.add(std::make_unique<juce::AudioParameterFloat>("alen", "alen", 0, 1, 0.5));
+	layout.add(std::make_unique<juce::AudioParameterFloat>("pitch", "pitch", 0, 1, 0.5));
+	layout.add(std::make_unique<juce::AudioParameterFloat>("matchf", "matchf", 0, 1, 1.0));
+	layout.add(std::make_unique<juce::AudioParameterFloat>("format", "format", 0, 1, 0.5));
 
 	return layout;
 }
@@ -172,11 +171,10 @@ void LModelAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 
 	float SampleRate = getSampleRate();
 
-	float fqt = *Params.getRawParameterValue("fqt");
-	float dft = *Params.getRawParameterValue("dft");
-	float dmt = *Params.getRawParameterValue("dmt");
-	float sv = *Params.getRawParameterValue("sv");
-	float tv = *Params.getRawParameterValue("tv");
+	float alen = *Params.getRawParameterValue("alen");
+	float pitch = *Params.getRawParameterValue("pitch");
+	float matchf = *Params.getRawParameterValue("matchf");
+	float format = *Params.getRawParameterValue("format");
 
 	//pvl.SetSliderLen(dft);
 	//pvr.SetSliderLen(dft);
@@ -185,13 +183,37 @@ void LModelAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	//pvl.ProcessBlock(recbufl, buf1l, buf2l, numSamples);
 	//pvr.ProcessBlock(recbufr, buf1r, buf2r, numSamples);
 
-	rsl.SetMatchF(tv);
-	rsr.SetMatchF(tv);
-	rsl.SetPitch(powf(2.0, (sv - 0.5) * 2.0 * 2.0));//4个8度
-	rsr.SetPitch(powf(2.0, (sv - 0.5) * 2.0 * 2.0));//4个8度
-	rsl.ProcessBlock(recbufl, buf1l, numSamples);
-	rsr.ProcessBlock(recbufr, buf1r, numSamples);
+	//rsl.SetMatchF(tv);
+	//rsr.SetMatchF(tv);
+	//rsl.SetPitch(powf(2.0, (sv - 0.5) * 2.0 * 2.0));//4个8度
+	//rsr.SetPitch(powf(2.0, (sv - 0.5) * 2.0 * 2.0));//4个8度
+	//rsl.ProcessBlock(recbufl, buf1l, numSamples);
+	//rsr.ProcessBlock(recbufr, buf1r, numSamples);
 
+	//formsep->resynth->applyformant
+
+	pvl.SetSliderLen(alen);
+	pvr.SetSliderLen(alen);
+	pvl.ProcessBlock(recbufl, buf1l, numSamples);//buf1:补偿了共振峰的信号
+	pvr.ProcessBlock(recbufr, buf1r, numSamples);
+
+	rsl.SetMatchF(matchf);
+	rsr.SetMatchF(matchf);
+	rsl.SetPitch(powf(2.0, (pitch - 0.5) * 2.0 * 2.0));//4个8度
+	rsr.SetPitch(powf(2.0, (pitch - 0.5) * 2.0 * 2.0));//4个8度
+	rsl.ProcessBlock(buf1l, buf2l, numSamples);//buf2:shift过后的信号
+	rsr.ProcessBlock(buf1r, buf2r, numSamples);
+
+	float* fdatl, * fdatr;
+	afl.SetFormantLen(pvl.GetFormant(fdatl));
+	afr.SetFormantLen(pvr.GetFormant(fdatr));
+	afl.SetFormantData(fdatl);
+	afr.SetFormantData(fdatr);
+
+	afl.SetFormatValue(powf(2.0, (format - 0.5) * 2.0 * 2.0));
+	afr.SetFormatValue(powf(2.0, (format - 0.5) * 2.0 * 2.0));
+	afl.ProcessBlock(buf2l, buf1l, numSamples);//buf1:应用共振峰的信号
+	afr.ProcessBlock(buf2r, buf1r, numSamples);
 
 	for (int i = 0; i < numSamples; ++i)
 	{

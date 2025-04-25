@@ -3,7 +3,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-
+/*
 struct QuadOsc//嫌慢可以打表cos
 {
 	float k1 = 0, k2 = 0;
@@ -38,7 +38,7 @@ struct QuadOsc//嫌慢可以打表cos
 		a = 0.0;
 	}
 };
-
+*/
 /*
 struct QuadOsc
 {
@@ -67,7 +67,7 @@ struct QuadOsc
 
 };*/
 /*
-struct QuadOsc
+struct QuadOsc//还是打表快
 {
 
 	unsigned int dt = 0, phase = 0;
@@ -95,6 +95,104 @@ struct QuadOsc
 		phase = 0;
 	}
 };*/
+
+struct QuadOscs//嫌慢可以打表cos
+{
+	constexpr static int NumOscs = 1024;
+	float k1[NumOscs] = { 0 }, k2[NumOscs] = { 0 };
+	float u[NumOscs] = { 0 }, v[NumOscs] = { 0 }, a[NumOscs] = { 0 };
+	inline void SetTabel(float* tabel)
+	{
+	}
+	inline void UpdataFreq(int bin, float freq)
+	{
+		/*
+		k1 = tanf(freq * M_PI);
+		k2 = 2.0 * k1 / (1.0 + k1 * k1);
+		//选做
+		float r = sqrtf(u * u + v * v);
+		u /= r;
+		v /= r;*/
+		k1[bin] = tanf(freq * M_PI);
+		k2[bin] = 2.0 * k1[bin] / (1.0 + k1[bin] * k1[bin]);
+		//选做
+		float r = sqrtf(u[bin] * u[bin] + v[bin] * v[bin]);
+		u[bin] /= r;
+		v[bin] /= r;
+	}
+	inline void UpdataAmp(int bin, float amp)
+	{
+		a[bin] = amp;
+	}
+	inline float Process(int numBins)
+	{/*
+		float tmp = u - k1 * v;
+		v = v + k2 * tmp;
+		u = tmp - k1 * v;
+		return u * a;*/
+		float sum = 0;
+		for (int j = 0; j < numBins; ++j)
+		{
+			float tmp = u[j] - k1[j] * v[j];
+			v[j] = v[j] + k2[j] * tmp;
+			u[j] = tmp - k1[j] * v[j];
+			sum += u[j] * a[j];
+		}
+		return sum;
+	}
+	inline void ResetPhase()
+	{/*
+		u = 1.0;//cos
+		v = 0.0;//sin
+		a = 0.0;*/
+		for (int j = 0; j < NumOscs; ++j)
+		{
+			u[j] = 1.0;//cos
+			v[j] = 0.0;//sin
+			a[j] = 0.0;
+		}
+	}
+};
+
+struct TableQuadOscs//还是打表快
+{
+	constexpr static int NumOscs = 1024;
+	unsigned int dt[NumOscs] = { 0 }, phase[NumOscs] = { 0 };
+	float a[NumOscs] = { 0 };
+	float QuadOscCosTabel[65536] = { 0 };
+	inline void InitTabel()
+	{
+		for (int i = 0; i < 65536; ++i)
+		{
+			QuadOscCosTabel[i] = cosf((float)i * 2.0 * M_PI / 65536.0);
+		}
+	}
+	inline void UpdataFreq(int bin, float freq)
+	{
+		dt[bin] = freq * 4294967296;
+	}
+	inline void UpdataAmp(int bin, float amp)
+	{
+		a[bin] = amp;
+	}
+	inline float Process(int numBins)
+	{
+		float sum = 0;
+		for (int i = 0; i < numBins; ++i)
+		{
+			phase[i] += dt[i];
+			sum += QuadOscCosTabel[phase[i] >> 16] * a[i];
+		}
+		return sum;
+	}
+	inline void ResetPhase()
+	{
+		for (int i = 0; i < NumOscs; ++i)
+		{
+			phase[i] = rand() % 1000;
+		}
+	}
+};
 class Resynth
 {
 
@@ -106,7 +204,7 @@ private:
 	float inbuf[FFTSize];
 	float fftdatre1[FFTSize];
 	float fftdatim1[FFTSize];
-	int pos = 0;
+	int pos = 0, hopPos = 0;
 
 	float normv = 1.0;
 
@@ -127,15 +225,16 @@ private:
 	//phase vocoder(加法合成)
 	float pitch = 1.0, matchf = 1.0;
 	float lastphase[FFTSize / 2] = { 0 };
-	QuadOsc oscs[FFTSize / 2];
+	//QuadOsc oscs[FFTSize / 2];
+	TableQuadOscs oscs;
 
-	float QuadOscCosTabel[65536];
+	//float QuadOscCosTabel[65536];//表
 
 	float amp[FFTSize / 2] = { 0 };//幅度值
 	float lastAmp[FFTSize / 2] = { 0 };//上次的幅度值
 	float mixv = 0.0, mixdt = 0.0;
 protected:
-	float warp_pi(float x)
+	inline float warp_pi(float x)
 	{
 		x /= 2.0 * M_PI;
 		x -= roundf(x);
@@ -143,10 +242,6 @@ protected:
 	}
 	void ProcessSTFT(float* rev1, float* imv1, int numBins, int hopSize)
 	{
-		float osamp = (float)FFTSize / hopSize;
-		float omega = 2.0 * M_PI * osamp * hopSize / FFTSize;
-		int binfreq = 48000.0 / FFTSize;
-
 		for (int j = 0; j < numBins; ++j)
 		{
 			lastAmp[j] = amp[j];
@@ -166,8 +261,8 @@ protected:
 			amp[j] = 0;
 			if (fl > 0.0 && fl < 1.0)
 			{
-				oscs[j].UpdataFreq(fl);
-				//oscs[j].UpdataAmp(mag);
+				//oscs[j].UpdataFreq(fl);
+				oscs.UpdataFreq(j, fl);
 				amp[j] = mag;
 			}
 		}
@@ -181,18 +276,22 @@ public:
 		memset(fftdatim1, 0, sizeof(fftdatim1));
 		memset(lastphase, 0, sizeof(lastphase));
 		UpdataWindow();
-		for (int i = 0; i < 65536; ++i)
+		/*for (int i = 0; i < 65536; ++i)//打
 		{
 			QuadOscCosTabel[i] = cosf((float)i * 2.0 * M_PI / 65536.0);
-		}
-		for (int i = 0; i < FFTSize / 2; ++i)
+		}*/
+		/*
+		for (int i = 0; i < FFTSize / 2; ++i)//表
 		{
 			oscs[i].SetTabel(QuadOscCosTabel);
-		}
+		}*/
+		/*
 		for (int i = 0; i < FFTSize / 2; ++i)
 		{
 			oscs[i].ResetPhase();
-		}
+		}*/
+		oscs.InitTabel();
+		oscs.ResetPhase();
 	}
 	void SetWindowAndHop(float window, float hop)//window = 1.0,hop = 0.25 is good
 	{
@@ -204,7 +303,7 @@ public:
 	int GetHopSize() { return hopSize; }
 	int GetFFTSize() { return FFTSize; }
 
-	void SetMatchF(float matchF)//是否需要相位信息
+	void SetMatchF(float matchF)//匹配相位信息
 	{
 		this->matchf = matchF;
 	}
@@ -223,9 +322,11 @@ public:
 		{
 			inbuf[pos] = in[i];
 			pos++;
+			hopPos++;
 			if (pos >= FFTSize)pos = 0;
-			if (pos % hopSize == 0)//填充完了！
+			if (hopPos >= hopSize)//填充完了！
 			{
+				hopPos = 0;
 				for (int j = 0; j < windowSize; ++j)//灌
 				{
 					fftdatre1[j] = inbuf[(pos + j) % FFTSize] * window[j];
@@ -246,16 +347,20 @@ public:
 			for (int j = 0; j < FFTSize / 2; ++j)
 			{
 				float ampv = lastAmp[j] * (1.0 - mixv) + amp[j] * mixv;
-				oscs[j].UpdataAmp(ampv);
+				//oscs[j].UpdataAmp(ampv);
+				oscs.UpdataAmp(j, ampv);
 			}
 			mixv += mixdt;
 
 			//resynth
+
 			float sum = 0;
+			/*
 			for (int j = 0; j < FFTSize / 2; ++j)
 			{
 				sum += oscs[j].Process();
-			}
+			}*/
+			sum = oscs.Process(FFTSize / 2);
 			sum /= FFTSize / 2;
 			out1[i] = sum;
 		}

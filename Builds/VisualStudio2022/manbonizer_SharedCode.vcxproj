@@ -2416,6 +2416,7 @@
     <ClInclude Include="..\..\Source\dsp\applyformant.h"/>
     <ClInclude Include="..\..\Source\dsp\resynth.h"/>
     <ClInclude Include="..\..\Source\dsp\formsep.h"/>
+    <ClInclude Include="..\..\Source\dsp\wsola.h"/>
     <ClInclude Include="..\..\Source\dsp\complex.h"/>
     <ClInclude Include="..\..\Source\dsp\fft.h"/>
     <ClInclude Include="..\..\Source\dsp\specDrift.h"/>

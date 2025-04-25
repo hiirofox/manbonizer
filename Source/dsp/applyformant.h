@@ -5,7 +5,7 @@
 #include <string.h>
 #include "fft.h"
 
-class ApplyFormant//共振峰分离
+class ApplyFormant//应用共振峰
 {
 private:
 	constexpr static int FFTSize = 1024;
@@ -83,11 +83,15 @@ public:
 
 	void SetFormatValue(float formatPitch)
 	{
-		this->format = formatPitch;
+		this->format = 1.0 / formatPitch;
 	}
 	void SetFormantData(float* formantDataPtr)
 	{
 		this->formant = formantDataPtr;
+	}
+	void SetFormantLen(int numFormantBins)
+	{
+		this->numFormantBins = numFormantBins;
 	}
 
 	void ProcessBlock(const float* in, float* out1, float numSamples)
