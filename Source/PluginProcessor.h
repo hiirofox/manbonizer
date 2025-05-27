@@ -9,10 +9,13 @@
 #pragma once
 
 #include <JuceHeader.h>
+/*
 #include "dsp/formsep.h"
 #include "dsp/resynth.h"
 #include "dsp/applyformant.h"
 #include "dsp/wsola.h"
+*/
+#include "dsp/formanter.h"
 
 //==============================================================================
 /**
@@ -72,9 +75,11 @@ private:
 	float buf1l[8192], buf1r[8192];
 	float buf2l[8192], buf2r[8192];
 
+	Formanter fml, fmr;
+	/*
 	FormantSeparator pvl, pvr;
 	Resynth rsl, rsr;
-	ApplyFormant afl, afr;
+	ApplyFormant afl, afr;*/
 
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LModelAudioProcessor)

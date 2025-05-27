@@ -32,9 +32,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout LModelAudioProcessor::create
 	juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
 	layout.add(std::make_unique<juce::AudioParameterFloat>("alen", "alen", 0, 1, 0.5));
-	layout.add(std::make_unique<juce::AudioParameterFloat>("pitch", "pitch", 0, 1, 0.5));
+	layout.add(std::make_unique<juce::AudioParameterFloat>("pitch", "pitch", -1, 1, 0));
+	//layout.add(std::make_unique<juce::AudioParameterFloat>("pitch", "pitch", 0.000001, 1, 0.5));
 	layout.add(std::make_unique<juce::AudioParameterFloat>("matchf", "matchf", 0, 1, 1.0));
-	layout.add(std::make_unique<juce::AudioParameterFloat>("format", "format", 0, 1, 0.5));
+	layout.add(std::make_unique<juce::AudioParameterFloat>("format", "format", -1, 1, 0));
 
 	return layout;
 }
@@ -192,6 +193,7 @@ void LModelAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 
 	//formsep->resynth->applyformant
 
+	/*
 	pvl.SetSliderLen(alen);
 	pvr.SetSliderLen(alen);
 	pvl.ProcessBlock(recbufl, buf1l, numSamples);//buf1:补偿了共振峰的信号
@@ -220,6 +222,22 @@ void LModelAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 		wavbufl[i] = buf1l[i];
 		wavbufr[i] = buf1r[i];
 	}
+
+	for (int i = 0; i < numSamples; ++i)
+	{
+		fml.bufin[i] = recbufl[i];
+		fmr.bufin[i] = recbufr[i];
+	}
+	*/
+
+	fml.SetPitch(440.0 * powf(2.0, pitch * 2.0 * 2.0));//4个8度
+	fmr.SetPitch(440.0 * powf(2.0, pitch * 2.0 * 2.0));
+	//fml.SetPitch(pitch);//4个8度
+	//fmr.SetPitch(pitch);
+	fml.SetFormant(powf(2.0, format * 2.0 * 2.0));
+	fmr.SetFormant(powf(2.0, format * 2.0 * 2.0));
+	fml.ProcessBlock(recbufl, wavbufl, numSamples);
+	fmr.ProcessBlock(recbufr, wavbufr, numSamples);
 }
 
 //==============================================================================

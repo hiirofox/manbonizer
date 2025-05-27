@@ -139,11 +139,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\dsp\complex.cpp"/>
     <ClCompile Include="..\..\Source\dsp\fft.cpp"/>
-    <ClCompile Include="..\..\Source\dsp\specDrift.cpp"/>
-    <ClCompile Include="..\..\Source\dsp\stft.cpp"/>
-    <ClCompile Include="..\..\Source\dsp\lpc.cpp"/>
     <ClCompile Include="..\..\Source\ui\LM_slider.cpp"/>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp"/>
     <ClCompile Include="..\..\Source\PluginEditor.cpp"/>
@@ -2413,17 +2409,9 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_extra.cpp"/>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\dsp\applyformant.h"/>
-    <ClInclude Include="..\..\Source\dsp\resynth.h"/>
-    <ClInclude Include="..\..\Source\dsp\formsep.h"/>
-    <ClInclude Include="..\..\Source\dsp\wsola.h"/>
-    <ClInclude Include="..\..\Source\dsp\complex.h"/>
+    <ClInclude Include="..\..\Source\dsp\elliptic-blep.h"/>
     <ClInclude Include="..\..\Source\dsp\fft.h"/>
-    <ClInclude Include="..\..\Source\dsp\specDrift.h"/>
-    <ClInclude Include="..\..\Source\dsp\stft.h"/>
-    <ClInclude Include="..\..\Source\dsp\te.h"/>
-    <ClInclude Include="..\..\Source\dsp\testPV.h"/>
-    <ClInclude Include="..\..\Source\dsp\lpc.h"/>
+    <ClInclude Include="..\..\Source\dsp\formanter.h"/>
     <ClInclude Include="..\..\Source\ui\LM_slider.h"/>
     <ClInclude Include="..\..\Source\PluginProcessor.h"/>
     <ClInclude Include="..\..\Source\PluginEditor.h"/>

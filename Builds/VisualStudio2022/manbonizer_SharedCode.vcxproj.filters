@@ -601,19 +601,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\dsp\complex.cpp">
-      <Filter>manbonizer\Source\dsp</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\dsp\fft.cpp">
-      <Filter>manbonizer\Source\dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\dsp\specDrift.cpp">
-      <Filter>manbonizer\Source\dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\dsp\stft.cpp">
-      <Filter>manbonizer\Source\dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\dsp\lpc.cpp">
       <Filter>manbonizer\Source\dsp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ui\LM_slider.cpp">
@@ -3057,37 +3045,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\dsp\applyformant.h">
-      <Filter>manbonizer\Source\dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\dsp\resynth.h">
-      <Filter>manbonizer\Source\dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\dsp\formsep.h">
-      <Filter>manbonizer\Source\dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\dsp\wsola.h">
-      <Filter>manbonizer\Source\dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\dsp\complex.h">
+    <ClInclude Include="..\..\Source\dsp\elliptic-blep.h">
       <Filter>manbonizer\Source\dsp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\dsp\fft.h">
       <Filter>manbonizer\Source\dsp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\dsp\specDrift.h">
-      <Filter>manbonizer\Source\dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\dsp\stft.h">
-      <Filter>manbonizer\Source\dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\dsp\te.h">
-      <Filter>manbonizer\Source\dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\dsp\testPV.h">
-      <Filter>manbonizer\Source\dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\dsp\lpc.h">
+    <ClInclude Include="..\..\Source\dsp\formanter.h">
       <Filter>manbonizer\Source\dsp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ui\LM_slider.h">

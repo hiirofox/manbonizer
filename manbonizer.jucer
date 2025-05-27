@@ -5,22 +5,10 @@
   <MAINGROUP id="Jp4yRe" name="manbonizer">
     <GROUP id="{D477C1DE-D360-6921-6A27-C8F4459F0878}" name="Source">
       <GROUP id="{316D98B3-4302-3305-1E6C-A19BDC2F4F51}" name="dsp">
-        <FILE id="egryUv" name="applyformant.h" compile="0" resource="0" file="Source/dsp/applyformant.h"/>
-        <FILE id="uFuaO0" name="resynth.h" compile="0" resource="0" file="Source/dsp/resynth.h"/>
-        <FILE id="QD7vEU" name="formsep.h" compile="0" resource="0" file="Source/dsp/formsep.h"/>
-        <FILE id="CiavHE" name="wsola.h" compile="0" resource="0" file="Source/dsp/wsola.h"/>
-        <FILE id="pmeeo8" name="complex.cpp" compile="1" resource="0" file="Source/dsp/complex.cpp"/>
-        <FILE id="EQejeP" name="complex.h" compile="0" resource="0" file="Source/dsp/complex.h"/>
+        <FILE id="UbPmU1" name="elliptic-blep.h" compile="0" resource="0" file="Source/dsp/elliptic-blep.h"/>
         <FILE id="hsU539" name="fft.cpp" compile="1" resource="0" file="Source/dsp/fft.cpp"/>
         <FILE id="qE1lHm" name="fft.h" compile="0" resource="0" file="Source/dsp/fft.h"/>
-        <FILE id="eT61s8" name="specDrift.cpp" compile="1" resource="0" file="Source/dsp/specDrift.cpp"/>
-        <FILE id="GySgCp" name="specDrift.h" compile="0" resource="0" file="Source/dsp/specDrift.h"/>
-        <FILE id="BlL4Di" name="stft.cpp" compile="1" resource="0" file="Source/dsp/stft.cpp"/>
-        <FILE id="xSIepU" name="stft.h" compile="0" resource="0" file="Source/dsp/stft.h"/>
-        <FILE id="clbFJ6" name="te.h" compile="0" resource="0" file="Source/dsp/te.h"/>
-        <FILE id="TJ0w3C" name="testPV.h" compile="0" resource="0" file="Source/dsp/testPV.h"/>
-        <FILE id="HBy8Ou" name="lpc.cpp" compile="1" resource="0" file="Source/dsp/lpc.cpp"/>
-        <FILE id="VSQZwV" name="lpc.h" compile="0" resource="0" file="Source/dsp/lpc.h"/>
+        <FILE id="szj06O" name="formanter.h" compile="0" resource="0" file="Source/dsp/formanter.h"/>
       </GROUP>
       <GROUP id="{5C43768E-1372-4779-0E46-1A72468A9CA4}" name="ui">
         <FILE id="US51Wy" name="LM_slider.cpp" compile="1" resource="0" file="Source/ui/LM_slider.cpp"/>
