@@ -511,7 +511,7 @@ public:
 	void SetPitch(float freq)
 	{
 		step = freq / 48000.0;
-		blockSize = 1.0 / step * 1.5 + 64;
+		blockSize = 1.0 / step * 2.0 + 96;
 		range = 1.0 / step * 32.0;
 		if (blockSize > MaxBlockSize)blockSize = MaxBlockSize;
 		if (range > MaxBlockSize)range = MaxBlockSize;
