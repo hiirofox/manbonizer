@@ -75,7 +75,7 @@ private:
 	float buf1l[8192], buf1r[8192];
 	float buf2l[8192], buf2r[8192];
 
-	Formanter fml, fmr;
+	Formanter3 fml, fmr;
 	/*
 	FormantSeparator pvl, pvr;
 	Resynth rsl, rsr;
