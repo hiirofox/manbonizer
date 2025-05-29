@@ -15,7 +15,7 @@
 #include "dsp/applyformant.h"
 #include "dsp/wsola.h"
 */
-#include "dsp/formanter.h"
+#include "dsp/manbo.h"
 
 //==============================================================================
 /**
@@ -75,7 +75,9 @@ private:
 	float buf1l[8192], buf1r[8192];
 	float buf2l[8192], buf2r[8192];
 
-	Formanter3 fml, fmr;
+	float channelPan[256];
+	//Formanter3 fml, fmr;
+	Manbonizer manbo;
 	/*
 	FormantSeparator pvl, pvr;
 	Resynth rsl, rsr;

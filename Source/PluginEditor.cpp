@@ -15,29 +15,29 @@ LModelAudioProcessorEditor::LModelAudioProcessorEditor(LModelAudioProcessor& p)
 {
 	// Make sure that before the constructor has finished, you've set the
 	// editor's size to whatever you need it to be.
-	setResizable(true, true); // 允许窗口调整大小
+	//setResizable(true, true); // 允许窗口调整大小
 
 	setOpaque(false);  // 允许在边框外面绘制
 
 	//setResizeLimits(64 * 11, 64 * 5, 10000, 10000); // 设置最小宽高为300x200，最大宽高为800x600
-	setSize(64 * 13, 64 * 4);
-	setResizeLimits(64 * 4, 64 * 4, 64 * 13, 64 * 4);
+	setSize(64 * 5, 64 * 2);
+	//setResizeLimits(64 * 4, 64 * 4, 64 * 13, 64 * 4);
 
 	//constrainer.setFixedAspectRatio(11.0 / 4.0);  // 设置为16:9比例
 	//setConstrainer(&constrainer);  // 绑定窗口的宽高限制
 
-	K_ALEN.setText("AnalyzeLen");
-	K_ALEN.ParamLink(audioProcessor.GetParams(), "alen");
-	addAndMakeVisible(K_ALEN);
-	K_PITCH.setText("Pitch");
-	K_PITCH.ParamLink(audioProcessor.GetParams(), "pitch");
-	addAndMakeVisible(K_PITCH);
-	K_MATCHF.setText("MatchF");
-	K_MATCHF.ParamLink(audioProcessor.GetParams(), "matchf");
-	addAndMakeVisible(K_MATCHF);
-	K_FORMAT.setText("Format");
-	K_FORMAT.ParamLink(audioProcessor.GetParams(), "format");
-	addAndMakeVisible(K_FORMAT);
+	K_Corr.setText("corr");
+	K_Corr.ParamLink(audioProcessor.GetParams(), "corr");
+	addAndMakeVisible(K_Corr);
+	K_Formant.setText("formant");
+	K_Formant.ParamLink(audioProcessor.GetParams(), "formant");
+	addAndMakeVisible(K_Formant);
+	K_Glide.setText("glide");
+	K_Glide.ParamLink(audioProcessor.GetParams(), "glide");
+	addAndMakeVisible(K_Glide);
+	K_Mix.setText("mix");
+	K_Mix.ParamLink(audioProcessor.GetParams(), "mix");
+	addAndMakeVisible(K_Mix);
 
 	startTimerHz(30);
 
@@ -67,10 +67,10 @@ void LModelAudioProcessorEditor::resized()
 	int x = bound.getX(), y = bound.getY(), w = bound.getWidth(), h = bound.getHeight();
 	auto convXY = juce::Rectangle<int>::leftTopRightBottom;
 
-	K_ALEN.setBounds(32 + 64 * 0, 32 + 64 * 0, 64, 64);
-	K_PITCH.setBounds(32 + 64 * 1, 32 + 64 * 0, 64, 64);
-	K_MATCHF.setBounds(32 + 64 * 2, 32 + 64 * 0, 64, 64);
-	K_FORMAT.setBounds(32 + 64 * 3, 32 + 64 * 0, 64, 64);
+	K_Corr.setBounds(32 + 64 * 0, 32 + 64 * 0, 64, 64);
+	K_Formant.setBounds(32 + 64 * 1, 32 + 64 * 0, 64, 64);
+	K_Glide.setBounds(32 + 64 * 2, 32 + 64 * 0, 64, 64);
+	K_Mix.setBounds(32 + 64 * 3, 32 + 64 * 0, 64, 64);
 }
 
 void LModelAudioProcessorEditor::timerCallback()

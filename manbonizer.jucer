@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="Q8G3ii" name="manbonizer" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              pluginCharacteristicsValue="pluginWantsMidiIn">
   <MAINGROUP id="Jp4yRe" name="manbonizer">
     <GROUP id="{D477C1DE-D360-6921-6A27-C8F4459F0878}" name="Source">
       <GROUP id="{316D98B3-4302-3305-1E6C-A19BDC2F4F51}" name="dsp">
@@ -9,6 +10,7 @@
         <FILE id="hsU539" name="fft.cpp" compile="1" resource="0" file="Source/dsp/fft.cpp"/>
         <FILE id="qE1lHm" name="fft.h" compile="0" resource="0" file="Source/dsp/fft.h"/>
         <FILE id="szj06O" name="formanter.h" compile="0" resource="0" file="Source/dsp/formanter.h"/>
+        <FILE id="joLMf4" name="manbo.h" compile="0" resource="0" file="Source/dsp/manbo.h"/>
       </GROUP>
       <GROUP id="{5C43768E-1372-4779-0E46-1A72468A9CA4}" name="ui">
         <FILE id="US51Wy" name="LM_slider.cpp" compile="1" resource="0" file="Source/ui/LM_slider.cpp"/>

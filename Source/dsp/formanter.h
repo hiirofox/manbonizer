@@ -457,6 +457,8 @@ private:
 	float block2[MaxBlockSize];
 	float formant = 1.0;
 
+	float window[MaxBufferSize];
+
 	constexpr static int JumpPoint = 2;
 	int GetMaxCorrIndex()
 	{
@@ -465,7 +467,7 @@ private:
 		for (int i = 0; i < range; i += JumpPoint)
 		{
 			float sum = 0;
-			for (int j = 0; j < blockSize; j += 4)
+			for (int j = 0; j < blockSize; j += 3)
 			{
 				float a = searchbuf[i + j];
 				float b = block[j];
@@ -485,7 +487,7 @@ private:
 		for (int i = start; i < end; i += 2)
 		{
 			float sum = 0;
-			for (int j = 0; j < blockSize; j += 4)
+			for (int j = 0; j < blockSize; j += 3)
 			{
 				float a = searchbuf[i + j];
 				float b = block[j];
@@ -501,12 +503,39 @@ private:
 
 		return maxIdx;
 	}
+	int lastlen;
+	void UpdataWindow(int len)
+	{
+		if (lastlen == len)return;
+		lastlen = len;
+		for (int i = 0; i < len; ++i)
+		{
+			window[i] = 0.5 - 0.5 * cosf(2.0 * M_PI * i / len);
+		}
+	}
 public:
 	Formanter3()
 	{
 		memset(bufin, 0, sizeof(bufin));
 		memset(bufout, 0, sizeof(bufout));
 		memset(block, 0, sizeof(block));
+	}
+	void Reset()
+	{
+		//memset(bufin, 0, sizeof(bufin));
+		memset(bufout, 0, sizeof(bufout));
+		memset(block, 0, sizeof(block));
+		//pos = 0;
+		posHop = 0;
+	}
+	void FillBuffer(const float* in, int numSamples)
+	{
+		for (int i = 0; i < numSamples; ++i)
+		{
+			bufin[pos] = in[i];
+			bufout[pos] = 0;
+			pos = (pos + 1) % MaxBufferSize;
+		}
 	}
 	void SetPitch(float freq)
 	{
@@ -522,6 +551,9 @@ public:
 	}
 	void ProcessBlock(const float* in, float* out, int numSamples)
 	{
+		float len = blockSize / formant;//每个周期，块的实际长度
+		if (len > blockSize)len = blockSize;
+		UpdataWindow(len);
 		for (int i = 0; i < numSamples; ++i)
 		{
 			bufin[pos] = in[i];
@@ -551,11 +583,10 @@ public:
 				}
 
 				resampler.Process2(block, block2, blockSize, blockSize, 1.0 / formant, 0);
-				float len = blockSize / formant;
-				if (len > blockSize)len = blockSize;
+
 				for (int j = 0; j < len; ++j)
 				{
-					float w = 0.5 - 0.5 * cosf(2.0 * M_PI * j / len);
+					float w = window[j];
 					block2[j] *= w;
 				}
 

@@ -31,11 +31,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout LModelAudioProcessor::create
 {
 	juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
-	layout.add(std::make_unique<juce::AudioParameterFloat>("alen", "alen", 0, 1, 0.5));
-	layout.add(std::make_unique<juce::AudioParameterFloat>("pitch", "pitch", -1, 1, 0));
-	//layout.add(std::make_unique<juce::AudioParameterFloat>("pitch", "pitch", 0.000001, 1, 0.5));
-	layout.add(std::make_unique<juce::AudioParameterFloat>("matchf", "matchf", 0, 1, 1.0));
-	layout.add(std::make_unique<juce::AudioParameterFloat>("format", "format", -1, 1, 0));
+	layout.add(std::make_unique<juce::AudioParameterFloat>("corr", "corr", 0, 1, 1));
+	layout.add(std::make_unique<juce::AudioParameterFloat>("formant", "formant", -1, 1, 0));
+	layout.add(std::make_unique<juce::AudioParameterFloat>("glide", "glide", 0, 1, 0));
+	layout.add(std::make_unique<juce::AudioParameterFloat>("mix", "mix", 0, 1, 1));
 
 	return layout;
 }
@@ -153,13 +152,23 @@ void LModelAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	juce::MidiBuffer::Iterator MidiBuf(midiMessages);
 	while (MidiBuf.getNextEvent(MidiMsg, MidiTime))
 	{
+		if (MidiMsg.isController() && MidiMsg.getControllerNumber() == 10) { // 10 = Pan控制器
+			const int channel = MidiMsg.getChannel(); // 通道转索引（0起）
+			if (channel >= 0 && channel < 16) {
+				channelPan[channel] = (float)(MidiMsg.getControllerValue()) / 127.0;
+			}
+		}
 		if (MidiMsg.isNoteOn())
 		{
-			int note = MidiMsg.getNoteNumber() - 24;
+			int note = MidiMsg.getNoteNumber();
+			float velo = (float)MidiMsg.getVelocity() / 127.0;
+			float pan = channelPan[MidiMsg.getChannel()];
+			manbo.NoteOn(note, velo, pan);
 		}
 		if (MidiMsg.isNoteOff())
 		{
-			int note = MidiMsg.getNoteNumber() - 24;
+			int note = MidiMsg.getNoteNumber();
+			manbo.NoteOff(note);
 		}
 	}
 	midiMessages.clear();
@@ -172,72 +181,22 @@ void LModelAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 
 	float SampleRate = getSampleRate();
 
-	float alen = *Params.getRawParameterValue("alen");
-	float pitch = *Params.getRawParameterValue("pitch");
-	float matchf = *Params.getRawParameterValue("matchf");
-	float format = *Params.getRawParameterValue("format");
+	float corr = *Params.getRawParameterValue("corr");
+	float formant = *Params.getRawParameterValue("formant");
+	float glide = *Params.getRawParameterValue("glide");
+	float mix = *Params.getRawParameterValue("mix");
 
-	//pvl.SetSliderLen(dft);
-	//pvr.SetSliderLen(dft);
-	//pvl.SetFormat(dmt);
-	//pvr.SetFormat(dmt);
-	//pvl.ProcessBlock(recbufl, buf1l, buf2l, numSamples);
-	//pvr.ProcessBlock(recbufr, buf1r, buf2r, numSamples);
+	auto toexp = [](float x, float n) {
+		float sign = x < 0 ? -1.0f : 1.0f;
+		x = fabsf(x);
+		return (expf((x - 1.0) * n) - expf(-n)) / (1.0 - expf(-n)) * sign;
+		};
 
-	//rsl.SetMatchF(tv);
-	//rsr.SetMatchF(tv);
-	//rsl.SetPitch(powf(2.0, (sv - 0.5) * 2.0 * 2.0));//4个8度
-	//rsr.SetPitch(powf(2.0, (sv - 0.5) * 2.0 * 2.0));//4个8度
-	//rsl.ProcessBlock(recbufl, buf1l, numSamples);
-	//rsr.ProcessBlock(recbufr, buf1r, numSamples);
+	formant = powf(2.0, formant * 2.0);
+	glide = toexp((1.0 - glide) * 2, 3);
 
-	//formsep->resynth->applyformant
-
-	/*
-	pvl.SetSliderLen(alen);
-	pvr.SetSliderLen(alen);
-	pvl.ProcessBlock(recbufl, buf1l, numSamples);//buf1:补偿了共振峰的信号
-	pvr.ProcessBlock(recbufr, buf1r, numSamples);
-
-	rsl.SetMatchF(matchf);
-	rsr.SetMatchF(matchf);
-	rsl.SetPitch(powf(2.0, (pitch - 0.5) * 2.0 * 2.0));//4个8度
-	rsr.SetPitch(powf(2.0, (pitch - 0.5) * 2.0 * 2.0));//4个8度
-	rsl.ProcessBlock(buf1l, buf2l, numSamples);//buf2:shift过后的信号
-	rsr.ProcessBlock(buf1r, buf2r, numSamples);
-
-	float* fdatl, * fdatr;
-	afl.SetFormantLen(pvl.GetFormant(fdatl));
-	afr.SetFormantLen(pvr.GetFormant(fdatr));
-	afl.SetFormantData(fdatl);
-	afr.SetFormantData(fdatr);
-
-	afl.SetFormatValue(powf(2.0, (format - 0.5) * 2.0 * 2.0));
-	afr.SetFormatValue(powf(2.0, (format - 0.5) * 2.0 * 2.0));
-	afl.ProcessBlock(buf2l, buf1l, numSamples);//buf1:应用共振峰的信号
-	afr.ProcessBlock(buf2r, buf1r, numSamples);
-
-	for (int i = 0; i < numSamples; ++i)
-	{
-		wavbufl[i] = buf1l[i];
-		wavbufr[i] = buf1r[i];
-	}
-
-	for (int i = 0; i < numSamples; ++i)
-	{
-		fml.bufin[i] = recbufl[i];
-		fmr.bufin[i] = recbufr[i];
-	}
-	*/
-
-	fml.SetPitch(440.0 * powf(2.0, pitch * 2.0 * 2.0));//4个8度
-	fmr.SetPitch(440.0 * powf(2.0, pitch * 2.0 * 2.0));
-	//fml.SetPitch(pitch);//4个8度
-	//fmr.SetPitch(pitch);
-	fml.SetFormant(powf(2.0, format * 2.0 * 2.0));
-	fmr.SetFormant(powf(2.0, format * 2.0 * 2.0));
-	fml.ProcessBlock(recbufl, wavbufl, numSamples);
-	fmr.ProcessBlock(recbufr, wavbufr, numSamples);
+	manbo.SetParam(corr, formant, glide, mix);
+	manbo.ProcessBlock(recbufl, recbufr, wavbufl, wavbufr, numSamples);
 }
 
 //==============================================================================

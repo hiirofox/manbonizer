@@ -30,10 +30,10 @@ private:
 	// access the processor object that created it.
 	LModelAudioProcessor& audioProcessor;
 
-	LMKnob K_ALEN;
-	LMKnob K_PITCH;
-	LMKnob K_MATCHF;
-	LMKnob K_FORMAT;
+	LMKnob K_Corr;
+	LMKnob K_Formant;
+	LMKnob K_Glide;
+	LMKnob K_Mix;
 
 	juce::ComponentBoundsConstrainer constrainer;  // 用于设置宽高比例
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LModelAudioProcessorEditor)

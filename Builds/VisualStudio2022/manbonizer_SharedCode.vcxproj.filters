@@ -3054,6 +3054,9 @@
     <ClInclude Include="..\..\Source\dsp\formanter.h">
       <Filter>manbonizer\Source\dsp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\dsp\manbo.h">
+      <Filter>manbonizer\Source\dsp</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\ui\LM_slider.h">
       <Filter>manbonizer\Source\ui</Filter>
     </ClInclude>
