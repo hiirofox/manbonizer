@@ -68,6 +68,9 @@ public:
 		return Params;
 	}
 
+	constexpr static int OutBufferLen = 2048;
+	float outbuf[OutBufferLen];
+	int pos = 0;
 private:
 	//Synth Param
 	static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

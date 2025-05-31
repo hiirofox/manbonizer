@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "ui/LM_slider.h"
+#include "ui/specturmUI.h"
 //==============================================================================
 /**
 */
@@ -34,6 +35,10 @@ private:
 	LMKnob K_Formant;
 	LMKnob K_Glide;
 	LMKnob K_Mix;
+	LMKnob K_Randpan;
+	LMKnob K_Keep;
+
+	SpectrumUI sp;
 
 	juce::ComponentBoundsConstrainer constrainer;  // 用于设置宽高比例
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LModelAudioProcessorEditor)

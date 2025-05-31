@@ -15,6 +15,7 @@
       <GROUP id="{5C43768E-1372-4779-0E46-1A72468A9CA4}" name="ui">
         <FILE id="US51Wy" name="LM_slider.cpp" compile="1" resource="0" file="Source/ui/LM_slider.cpp"/>
         <FILE id="Rfdl86" name="LM_slider.h" compile="0" resource="0" file="Source/ui/LM_slider.h"/>
+        <FILE id="rVUFu1" name="specturmUI.h" compile="0" resource="0" file="Source/ui/specturmUI.h"/>
       </GROUP>
       <FILE id="jAsJ3t" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>

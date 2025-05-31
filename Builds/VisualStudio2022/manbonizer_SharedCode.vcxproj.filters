@@ -3060,6 +3060,9 @@
     <ClInclude Include="..\..\Source\ui\LM_slider.h">
       <Filter>manbonizer\Source\ui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\ui\specturmUI.h">
+      <Filter>manbonizer\Source\ui</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\PluginProcessor.h">
       <Filter>manbonizer\Source</Filter>
     </ClInclude>

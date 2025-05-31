@@ -16,7 +16,8 @@ private:
 	float noteVelo[MaxPolyNum];
 	float notePan[MaxPolyNum];
 
-	float corr, formant, glide, mix;
+	float corr, formant, keep, glide, mix;
+	float samplerate = 48000;
 
 	float tmp1l[8192];
 	float tmp1r[8192];
@@ -69,12 +70,14 @@ public:
 			}
 		}
 	}
-	void SetParam(float corr, float formant, float glide, float mix)
+	void SetParam(float corr, float formant, float keep, float glide, float mix, float samplerate)
 	{
 		this->corr = corr;
 		this->formant = formant;
+		this->keep = keep;
 		this->glide = glide;
 		this->mix = mix;
+		this->samplerate = samplerate;
 	}
 	void ProcessBlock(const float* inl, const float* inr, float* outl, float* outr, int numSamples)
 	{
@@ -98,8 +101,8 @@ public:
 				float freq = C4Freq * powf(2.0, (float)(note - 48) / 12.0);
 				float fm = 1.0 * corr + (freq / C4Freq) * (1.0 - corr);
 				fm *= formant;
-				fml[i].SetPitch(freq);
-				fmr[i].SetPitch(freq);
+				fml[i].SetPitch(freq, keep, samplerate);
+				fmr[i].SetPitch(freq, keep, samplerate);
 				fml[i].SetFormant(fm);
 				fmr[i].SetFormant(fm);
 				fml[i].ProcessBlock(inl, tmp1l, numSamples);

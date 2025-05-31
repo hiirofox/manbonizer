@@ -35,6 +35,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout LModelAudioProcessor::create
 	layout.add(std::make_unique<juce::AudioParameterFloat>("formant", "formant", -1, 1, 0));
 	layout.add(std::make_unique<juce::AudioParameterFloat>("glide", "glide", 0, 1, 0));
 	layout.add(std::make_unique<juce::AudioParameterFloat>("mix", "mix", 0, 1, 1));
+	layout.add(std::make_unique<juce::AudioParameterFloat>("randpan", "randpan", 0, 1, 0));
+	layout.add(std::make_unique<juce::AudioParameterFloat>("keep", "keep", 0.1, 1.0, 1.0));
 
 	return layout;
 }
@@ -146,7 +148,7 @@ bool LModelAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) co
 
 void LModelAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-	int isMidiUpdata = 0;
+	float randpan = *Params.getRawParameterValue("randpan");
 	juce::MidiMessage MidiMsg;//先处理midi事件
 	int MidiTime;
 	juce::MidiBuffer::Iterator MidiBuf(midiMessages);
@@ -154,15 +156,16 @@ void LModelAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	{
 		if (MidiMsg.isController() && MidiMsg.getControllerNumber() == 10) { // 10 = Pan控制器
 			const int channel = MidiMsg.getChannel(); // 通道转索引（0起）
-			if (channel >= 0 && channel < 16) {
-				channelPan[channel] = (float)(MidiMsg.getControllerValue()) / 127.0;
-			}
+			channelPan[channel] = (float)(MidiMsg.getControllerValue()) / 127.0;
 		}
 		if (MidiMsg.isNoteOn())
 		{
 			int note = MidiMsg.getNoteNumber();
 			float velo = (float)MidiMsg.getVelocity() / 127.0;
-			float pan = channelPan[MidiMsg.getChannel()];
+			//float pan = channelPan[MidiMsg.getChannel()];
+			float pan = 0.5 + (float)(rand() % 10000) / 10000.0 * (rand() % 2 ? 1 : -1) * randpan;
+			if (pan < 0)pan = 0;
+			if (pan > 1)pan = 1;
 			manbo.NoteOn(note, velo, pan);
 		}
 		if (MidiMsg.isNoteOff())
@@ -185,6 +188,7 @@ void LModelAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	float formant = *Params.getRawParameterValue("formant");
 	float glide = *Params.getRawParameterValue("glide");
 	float mix = *Params.getRawParameterValue("mix");
+	float keep = *Params.getRawParameterValue("keep");
 
 	auto toexp = [](float x, float n) {
 		float sign = x < 0 ? -1.0f : 1.0f;
@@ -195,8 +199,14 @@ void LModelAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
 	formant = powf(2.0, formant * 2.0);
 	glide = toexp((1.0 - glide) * 2, 3);
 
-	manbo.SetParam(corr, formant, glide, mix);
+	manbo.SetParam(corr, formant, keep, glide, mix, SampleRate);
 	manbo.ProcessBlock(recbufl, recbufr, wavbufl, wavbufr, numSamples);
+
+	for (int i = 0; i < numSamples; ++i)
+	{
+		outbuf[pos++] = wavbufl[i] + wavbufr[i];
+		if (pos >= OutBufferLen)pos = 0;
+	}
 }
 
 //==============================================================================
